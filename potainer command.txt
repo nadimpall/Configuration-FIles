@@ -1,0 +1,165 @@
+Docker installation:-
+===================
+
+yum install docker
+
+yum install epel-release
+
+yum install docker-io
+
+
+systemctl start docker 
+systemctl status docker
+systemctl enable docker
+
+
+
+DOcker for UI can operate from UI:-
+==================================
+
+sudo docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer      to run through UI
+
+docker run -d --restart unless-stopped -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+
+
+IP:9000
+
+username:- 
+password:- 
+
+
+To disable the sudo while accessing the docker commands from user:-
+===================================================================
+
+$ sudo groupadd docker
+$ sudo usermod -aG docker $USER
+
+then restart the docker service and close the terminal and re-open it to eliminate the sudo while using docker command
+
+
+docker images  to see images
+docker ps      to see the running conatiners
+docker ps -a   to see all running and stoped containers
+
+docker run -it -d ubuntu           to run and to create the container
+
+            -it is a interactive(input terminal) and -d is to run in the background(detach mode)
+
+docker run -d --name mydoncatiner <imagename>   to run in the backend
+
+docker start container id    to start the container 
+
+docker stop conatiner id      to stop the container
+
+docker pause container id      to pause the container
+
+docker unpause container id    to unpause the container
+
+docker restart containerid     to restart the container 
+
+docker kill container id       to kill the container
+
+docker rename zealous_matsumoto elasticsearch           to rename the container
+
+docker rm $(docker ps -q -f status=exited)  to remove all the stoped docker containers
+
+docker run -it --name mycontainer <imagename>   to run the container with specific name and can create multiple containers from one image with different name
+
+docker ps -l     to check the latest running container
+
+docker ps -q     to check the only id's of running conatiners
+
+docker logs container id     to check the logs of the container
+
+docker logs -f container id    to check the live logs of the container
+
+docker rmi imageid      to delete the docker images
+
+docker inspect container id            to check the details of container like ip address
+
+
+docker rm container id     to delete the container 
+
+docker run -it -p 80:80 --name webapp image name  
+
+                  80 to expose the port to outside (port forwarding)
+
+docker attach ContainerID  see the process utilization in that Docker container.
+
+
+docker top ContainerID      to check the top processor consuming container
+
+docker stats ContainerID     This command is used to provide the statistics of a running container.The above command will provide CPU and memory utilization of the Container 
+
+docker cp client-web.war client-web:/usr/    to copy the file from host machine to docker conatiner
+
+docker pull tutum/hello-world 
+
+docker run -it -p 80:80 --name webapp tutum/hello-world 
+
+
+ctl pq to exit with out stoping the conatiner
+docker start to start the tutum 
+
+
+docker exec -it container id /bin/bash  to enter the container
+
+docker commit container id imagename   any changes went in the conatainer it will save and can use it later
+
+#How to clean logs of docker container
+
+docker inspect docker inspect --format='{{.LogPath}}' <container id/name>
+truncate -s 0 /path/to/logfile
+
+
+docker compose:-
+==============
+
+
+create file.yml
+
+write the script in the file.yml
+
+example:-
+
+version: '3'
+
+services:
+
+   web:
+     image: nginx
+
+   database:
+      image: redis
+
+docker-compose config    to check the yml script is it correct or not
+
+
+docker-compose up -d       to run the container multiple
+
+docker-compose down        to stop the containers multiple
+
+
+
+docker scale:-             to run the conatiners multiple identically 
+=============
+
+docker-compose up -d --scale database=4      by using this command we can create 4 database containers
+
+docke-compose down
+
+
+
+
+docker network:-
+==============
+sudo yum install bridge-utils -y    to check brctl show for interfaces,this is not related docker
+
+brctl show docker0                   to check the interfaces
+
+docket network inspect bridge          to check the bridge network
+
+dokcer network ls                       to list the network in docker
+
+docker network rm network name          to delete the docker network 
+
