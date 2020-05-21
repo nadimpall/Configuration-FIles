@@ -1,0 +1,227 @@
+208 ansible server
+
+ssh-keygen -t rsa
+
+cd .ssh/
+
+ssh-copy-id username@ip
+
+
+ipaddress ansible_user=novelirs ansible_port=22  ----to be added in hosts 
+
+OR
+
+ipaddress  ansible_ssh_port=22 ansible_ssh_user=novelirs ansible_ssh_pass=$ind123
+
+#Before executing the yml scripts make sure hosts username should be in nopasswd
+
+#if get any error try bellow command once
+
+ansible-playbook git.yml  --ask-pass -K
+
+
+
+yml script for installation of git in multiple servers
+=====================================================
+---
+- hosts: server
+  gather_facts: no
+  become: true
+  become_method: sudo
+  tasks:
+    - name: installation of git
+      yum:
+        name: git
+        state: present
+
+To remove the git in multiple servers
+=====================================
+
+---
+- hosts: server
+  gather_facts: no
+  become: true
+  become_method: sudo
+  tasks:
+    - name: installation of git
+      yum:
+        name: git
+        state: absent
+
+
+
+copy file from source to destination
+===================================
+
+
+---
+- hosts: server
+  gather_facts: false
+  become: yes
+  become_method: sudo
+  become_user: novelirs
+  tasks:
+    - name: copy file from sorce to dest
+      copy:
+        src: /home/novelirs/new.sh
+        dest: /home/novelirs
+        owner: novelirs
+        group: novelirs
+        mode: u+rwx,g+rwx,o+rwx
+
+removing file in the host server
+================================
+
+---
+- hosts: server
+  gather_facts: false
+  become: yes
+  become_method: sudo
+  become_user: novelirs
+  tasks:
+    - name: Removing file
+      file:
+        path: /home/novelirs/new.sh
+        state: absent
+
+
+
+
+
+
+REPLACEMENT OF NAME OR FILE OR FILE TO IP SYNTAX
+=================================================
+
+EXAMPLE:- 
+
+- replace:
+    path: /etc/app.conf
+    regexp: 'foo'
+    replace: 'bar'
+    backup: yes
+
+
+- hosts: mysql
+  become: yes
+  become_method: sudo
+  gather_facts: no
+
+COPYING SOURCE TO DESTINATION YML
+================================
+
+  tasks:
+  - copy:
+       src: /home/novelirs/miratagent.tar.gz
+       dest: /opt/
+
+USING COMMAND TO EXECUTE IN YML
+=============================== 
+
+ - name : extracting tar file
+    command : "sudo tar -zxvf /opt/miratagent.tar.gz"
+
+ - name : replace activeMQ
+   replace :
+     path : /opt/miratagent/rim/unix/info.py
+     regexp : 'ACTIVEMQ_IPADDRESS'
+     replace : '192.168.0.168'
+     backup : yes
+
+
+- name : removing  tar file
+    command : "sudo rm -rf /opt/miratagent.tar.gz"
+
+  - name : restart the agent
+    command : "sudo supervisorctl restart agent_daemon"
+
+USING VARIABLE TO CREATE DATABASE,COPY AND IMPORT
+=================================================
+
+- hosts: '{{ hosts }}'
+  become: yes
+
+  tasks:
+
+   - name: Create Mirat Dynamic Schema
+     mysql_db:
+       name: '{{ mirat_schema_name }}'
+       login_host: '{{ db_ip_address }}'
+       login_port: '{{ db_port }}'
+       login_user: '{{ db_user }}'
+       login_password: '{{ db_pwd }}'
+
+   - name: Create Lepton Dynamic Schema
+     mysql_db:
+       name: '{{ lepton_schema_name }}'
+       login_host: '{{ db_ip_address }}'
+       login_port: '{{ db_port }}'
+       login_user: '{{ db_user }}'
+       login_password: '{{ db_pwd }}'
+
+   - name: Copy Mirat Database Dump File
+     copy:
+      src: '{{ mirat_tiedot_sql_path }}'
+      dest: /home/novelirs/
+
+   - name: Copy Lepton Database Dump File
+     copy:
+      src: '{{ tiedot_lepton_sql_path }}'
+      dest: /home/novelirs/
+
+   - name: import mirat schema dump into client schema
+     mysql_db:
+       name: '{{ mirat_schema_name }}'
+       state: import
+       target: /home/novelirs/{{ mirat_tiedot_sql_name }}
+       login_host: '{{ db_ip_address }}'
+       login_port: '{{ db_port }}'
+       login_user: '{{ db_user }}'
+       login_password: '{{ db_pwd }}'
+
+   - name: import lepton schema dump into client schema
+     mysql_db:
+       name: '{{ lepton_schema_name }}'
+       state: import
+       target: /home/novelirs/{{ tiedot_lepton_sql_name }}
+       login_host: '{{ db_ip_address }}'
+       login_port: '{{ db_port }}'
+       login_user: '{{ db_user }}'
+       login_password: '{{ db_pwd }}'
+
+   - name: delete all dump files in db server
+     file:
+       path: dumptest/
+       state: absent
+
+COMMAND:-
+
+ansible-playbook /home/novelirs/GROUP_180523415/dynamicSchemaCreation.yml --extra-vars "hosts=GROUP_180523415" --extra-vars "db_ip_address=192.168.0.26" --extra-vars "db_user=mirat" --extra-vars "db_pwd=\$Ind1234" --extra-vars "db_port=3306" --extra-vars "mirat_schema_name=novel_mirat_tiedot" --extra-vars "lepton_schema_name=novel_tiedot_lepton" --extra-vars "mirat_tiedot_sql_path=/home/novelirs/GROUP_180523415/mirat_tiedot.sql" --extra-vars "tiedot_lepton_sql_path=/home/novelirs/GROUP_180523415/tiedot_lepton.sql" --extra-vars "mirat_tiedot_sql_name=mirat_tiedot.sql" --extra-vars "tiedot_lepton_sql_name=tiedot_lepton.sql"   --ask-pass -K
+
+
+
+USING VARIABLE
+==============
+
+---
+- hosts: '{{ server }}'
+  gather_facts: no
+  become: true
+  become_method: sudo
+  tasks:
+    - name: installation of git
+      yum:
+        name: git
+        state: present
+command:-
+
+ansible-playbook gitinstallvar.yml -e server=server
+
+
+
+
+
+USE BELOW TO ADD IN HOSTS TO FIND THE PYTHON PATH IN SERVER FOR INTERPRETER
+===========================================================================
+
+[db]
+123.123.123.123 ansible_python_interpreter=/usr/bin/python3
