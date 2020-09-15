@@ -1,0 +1,34 @@
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  name: clb-mirat-app
+#  namespace: default
+#  annotations:
+#    kubernetes.io/ingress.class: alb
+#    alb.ingress.kubernetes.io/scheme: internet-facing
+# labels:
+#    app: mirat-app
+#spec:
+#  rules:
+#    - http:
+#        paths:
+#          - path: /*
+#            backend:
+#              serviceName: deployment-nodeport-service
+#              servicePort: 8080
+
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: clb-mirat-app
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+  labels:
+    app: mirat-app
+spec:
+  backend:
+    serviceName: deployment-nodeport-service
+    servicePort: 8080

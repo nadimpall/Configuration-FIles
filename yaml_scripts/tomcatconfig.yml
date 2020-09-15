@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mirat-configmap-pod
+spec:
+  containers:
+    - name: mirat-cm
+      image: tomcat:8.5.41
+      volumeMounts:
+      - name: mirat-config-volume
+        mountPath: /usr/local/tomcat/properties
+  volumes:
+    - name: mirat-config-volume
+      configMap:
+        name: miratprop
+ 
