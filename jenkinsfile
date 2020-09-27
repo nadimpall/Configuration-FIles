@@ -17,6 +17,19 @@ pipeline{
                 echo "****************Successfully Build*****************"
            }    
        } 
+       
+       stage("Sonar Qube"){
+           steps{
+               script{
+                   withSonarQubeEnv('sonarqube'){
+                   bat "mvn sonar:sonar \
+                      -Dsonar.projectKey=sample \
+                      -Dsonar.host.url=http://localhost:9000 \
+                      -Dsonar.login=71eb51d54e5a371ecc787e111fda85ce319665ab"
+                   }
+               }
+           }
+       }
     
         stage("Deploy to Artifact repo"){
             steps{
