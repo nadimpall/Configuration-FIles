@@ -51,5 +51,17 @@ pipeline{
             }
         }
         
+        stage("Deploy to Tomcat"){
+            steps{
+                deploy adapters: [
+                    tomcat8(credentialsId: 'tomcatapp', 
+                    path: '', url: 'http://localhost:1234/')
+                    ], 
+                    contextPath: 'spring-mvc-example', 
+                    war: '**/*.war'
+            }
+        }
+    
+        
     }
 }
