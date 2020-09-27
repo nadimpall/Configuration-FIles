@@ -1,27 +1,21 @@
-pipeline {
-    
-     agent any
-     
-     stages {
-         stage("build") {
-              
-             steps {
-                 echo 'building'
-                }
-          }
-         
-          stage("test") {
-              
-             steps {
-                  echo 'testing'
-             }
-          }
-
-          stage("deploy") {
-              
-             steps {
-                   echo 'deploying'
-              }
-          }
-     }
+pipeline{
+    agent any
+    environment{
+        PATH = "E:/MAVEN/apache-maven-3.5.4/bin:$PATH"
+    }
+    stages{
+        stage("Git checkout"){
+            steps{
+                git 'https://github.com/nadimpall/karthikproject.git'
+                echo "****************Successfully cloned****************"
+            }
+        }
+       
+       stage("Build"){
+           steps{
+                bat "mvn clean install"
+                echo "****************Successfully Build*****************"
+           }    
+       } 
+    }
 }
