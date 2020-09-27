@@ -17,5 +17,26 @@ pipeline{
                 echo "****************Successfully Build*****************"
            }    
        } 
+    
+        stage("Deploy to Artifact repo"){
+            steps{
+                nexusArtifactUploader artifacts: [
+                    [
+                        artifactId: 'spring-mvc-example', 
+                        classifier: '', 
+                        file: 'target\\spring-mvc-example.war', 
+                        type: 'war'
+                    ]
+                ], 
+                credentialsId: 'nexus', 
+                groupId: 'test', 
+                nexusUrl: 'localhost:8081', 
+                nexusVersion: 'nexus3', 
+                protocol: 'http', 
+                repository: 'maven-releases', 
+                version: '$BUILD_ID'
+            }
+        }
+        
     }
 }
