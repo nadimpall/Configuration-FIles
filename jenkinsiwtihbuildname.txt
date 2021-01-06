@@ -1,0 +1,24 @@
+currentBuild.displayName = "Monitor1-#"+"BuildNumber-"+currentBuild.number+"#BranchName-"+"${Branch}"
+
+pipeline{
+    
+   agent any
+    
+    
+        stages{
+        
+           stage("Git clone"){
+            
+               steps{
+                
+                 git 'https://github.com/nadimpall/karthikproject.git'
+                
+                 echo "****************Successfully cloned****************"
+    
+        }
+  
+      }
+  
+  }
+
+}
