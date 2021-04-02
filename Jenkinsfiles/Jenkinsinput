@@ -1,0 +1,22 @@
+currentBuild.displayName = "Project-"+currentBuild.number
+pipeline {
+    agent any
+    options {
+    buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '4')
+    }
+
+    stages {
+        stage('Git Clone') {
+              input {
+                message "Can we Proceed?"
+                ok "Yes"
+                submitter "karthik"
+            }
+             
+            steps {
+                git branch: 'karthik', url: 'https://github.com/nadimpall/karthikproject.git'
+                echo "Running ${env.BUILD_ID}"
+            }
+        }
+    }
+}
