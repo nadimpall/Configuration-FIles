@@ -1,0 +1,32 @@
+
+currentBuild.displayName = "Project-"+currentBuild.number
+pipeline {
+    agent any
+    
+    options {
+    buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '4')
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git 'https://github.com/nadimpall/karthikproject.git'
+                echo "Running ${env.BUILD_ID}"
+            }
+        }
+    
+        stage("Build"){
+           steps{
+                bat "mvn clean install"
+                              
+                echo "Successfully Build with BuildNumber >>>> ${env.BUILD_ID}"
+           }    
+       } 
+        
+        stage ('upload') {
+            steps {
+               bat "curl -X PUT -u admin:password -T C:/Windows/System32/config/systemprofile/AppData/Local/Jenkins/.jenkins/workspace/urbanCodeDeploy-jenkinsfile/target/spring-mvc-example.war http://localhost:8081/artifactory/libs-snapshot-local/spring-mvc-example.war"
+            }
+        }
+    }
+}
