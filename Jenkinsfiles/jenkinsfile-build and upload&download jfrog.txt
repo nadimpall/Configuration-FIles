@@ -25,12 +25,22 @@ pipeline {
         
         stage ('uploading to jfrog repo') {
             steps {
+               echo "*******************************************************************"
+               echo "Uploading latest build number - ${env.BUILD_ID} to the Artifactiory"
+               echo "*******************************************************************"
+               echo "                                                                "
+               echo "                           "
                bat "curl -X PUT -u admin:password -T C:/Windows/System32/config/systemprofile/AppData/Local/Jenkins/.jenkins/workspace/urbanCodeDeploy-jenkinsfile/target/spring-mvc-example.war http://localhost:8081/artifactory/libs-snapshot-local/spring-mvc-example.war.${env.BUILD_ID}"
             }
         }
         
-        stage ('Downloading artifactory from repo') {
+        stage ('Downloading artifactory') {
             steps {
+               echo "****************************************************************"
+               echo "Downloading latest build number - ${env.BUILD_ID} to the webapps"
+               echo "****************************************************************"
+               echo "                                                                "
+               echo "                                                                "
                bat "curl -u admin:password -XGET http://localhost:8081/artifactory/libs-snapshot-local/spring-mvc-example.war.${env.BUILD_ID} --output E:/apache-tomcat-8.5.66/webapps/spring-mvc-example.war"
             }
         }
