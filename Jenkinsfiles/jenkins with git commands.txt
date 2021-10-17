@@ -1,0 +1,24 @@
+pipeline {
+
+    agent any
+
+    stages {
+        
+        stage('Git Clone') {
+            steps {
+                git branch: 'karthik', url: 'https://github.com/nadimpall/karthikproject.git'
+                echo "Running ${env.BUILD_ID}"
+            }
+            
+        }
+        stage('git commands') {
+           
+            steps {
+               
+                script {
+                   bat 'git rev-parse --short HEAD'
+                }
+            }
+        }
+    }
+}
