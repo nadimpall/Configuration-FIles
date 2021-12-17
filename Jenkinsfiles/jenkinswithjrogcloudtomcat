@@ -1,0 +1,101 @@
+
+currentBuild.displayName = "Project-"+currentBuild.number
+pipeline {
+    agent any
+    
+ parameters {
+    string 'FROM_BRANCH'
+    choice choices: ['prod', 'qa'], description: 'Chose proper environment to deploy', name: 'Deploy_to'
+ }
+
+    options {
+    buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '4')
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: "${params.FROM_BRANCH}", url: 'https://github.com/nadimpall/karthikproject.git'
+                echo "Running ${env.BUILD_ID}"
+            }
+        }
+    
+        stage("Build"){
+           steps{
+                bat "mvn clean install"
+                              
+                echo "Successfully Build with BuildNumber >>>> ${env.BUILD_ID}"
+           }    
+       } 
+        
+         stage("Sonar Qube"){
+           steps{
+               script{
+                   withSonarQubeEnv('sonarqube'){
+                   bat "mvn sonar:sonar \
+  			-Dsonar.projectKey=karthikproject \
+		        -Dsonar.host.url=http://localhost:9000 \
+		        -Dsonar.login=36ce839f61c85a9968a42a8d2ecae8dc54b4c9bc"
+                   }
+               }
+           }
+       }
+        
+         stage ('uploading to jfrog repo') {
+            steps {
+               withCredentials([usernamePassword(credentialsId: 'JfrogCloud', passwordVariable: 'Password', usernameVariable: 'UserName')]){
+               echo "*******************************************************************"
+               echo "Uploading latest build number - ${env.BUILD_ID} to the Artifactiory"
+               echo "*******************************************************************"
+               echo "                                                                "
+               echo "                           "
+               bat "curl -X PUT -u %UserName%:%Password% -T C:/Windows/System32/config/systemprofile/AppData/Local/Jenkins/.jenkins/workspace/PipelineIfCondition/target/spring-mvc-example.war https://nkarthik206.jfrog.io/artifactory/karthik-libs-release/spring-mvc-example.war.${env.BUILD_ID}"
+               
+            }
+        }
+    }
+        stage ('Downloading artifactory') {
+                when {
+             expression {env.Deploy_to == 'prod'}
+                 }
+            steps {
+               withCredentials([usernamePassword(credentialsId: 'Jfrog', passwordVariable: 'Password', usernameVariable: 'UserName')]){
+               echo "****************************************************************"
+               echo "Downloading latest build number - ${env.BUILD_ID} to the webapps"
+               echo "****************************************************************"
+               echo "                                                                "
+               echo "                                                                "
+               bat "curl -u %UserName%:%Password% -XGET https://nkarthik206.jfrog.io/artifactory/karthik-libs-release/spring-mvc-example.war.${env.BUILD_ID} --output E:/apache-tomcat-8.5.66/webapps/spring-mvc-example.war"
+                //bat "curl -u admin:password -s -O http://localhost:8081/artifactory/libs-snapshot-local/spring-mvc-example.war"               
+            }
+        }
+        
+       } 
+        
+        
+        stage('QA Deploy') {
+            
+            when {
+             expression {env.Deploy_to == 'qa'}
+            }
+            steps {
+                
+                echo '                       '
+                echo '***********************'
+                echo 'Deploying to qa servers'
+                echo '***********************'
+            }
+        }
+        
+        
+    }
+}
+
+/*
+post {
+    always {
+       mail bcc: '', body: 'build', cc: '', from: 'nkarthik206@gmail.com', replyTo: '', subject: 'Build', to: 'nkarthik206@gmail.com'
+    }
+}
+}
+*/
