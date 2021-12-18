@@ -1,0 +1,36 @@
+
+currentBuild.displayName = "Project-"+currentBuild.number
+pipeline {
+    agent any
+    
+    environment {
+    registry = "default-docker-virtual"
+    registryCredential = 'JfrogCloud'
+  }
+     options {
+    buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '4')
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'dockerbranch', url: 'https://github.com/nadimpall/karthikproject.git'
+                echo "Running ${env.BUILD_ID}"
+            }
+        }
+    
+        stage("Build"){
+           steps{
+                bat "mvn clean install"
+                              
+                echo "Successfully Build with BuildNumber >>>> ${env.BUILD_ID}"
+           }    
+       } 
+        stage('Docker Build & Tag'){
+        steps{
+            bat 'docker build . -t nkarthik206.jfrog.io/default-docker-virtual/default-docker-virtual:'+env.BUILD_ID
+
+           }
+        }
+    }
+}
