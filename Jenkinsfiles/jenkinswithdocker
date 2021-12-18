@@ -32,5 +32,15 @@ pipeline {
 
            }
         }
+        stage('Docker Push'){
+            steps{
+            withCredentials([usernamePassword(credentialsId: 'JfrogCloud', passwordVariable: 'Password', usernameVariable: 'UserName')]){
+            bat 'docker login -u %UserName% -p %Password% nkarthik206.jfrog.io'
+            bat 'docker push nkarthik206.jfrog.io/default-docker-virtual/default-docker-virtual:'+env.BUILD_ID
+            
+            }    
+        }
+       
+        }
     }
 }
