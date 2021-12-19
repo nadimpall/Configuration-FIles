@@ -2,11 +2,7 @@
 currentBuild.displayName = "Project-"+currentBuild.number
 pipeline {
     agent any
-    
-    environment {
-    registry = "default-docker-virtual"
-    registryCredential = 'JfrogCloud'
-  }
+   
      options {
     buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '4')
     }
@@ -42,5 +38,10 @@ pipeline {
         }
        
         }
-    }
+        stage('Docker Deploy'){
+            steps{
+           bat 'docker run -itd -p 2345:8080 nkarthik206.jfrog.io/default-docker-virtual/default-docker-virtual:'+env.BUILD_ID
+           }
+        }
+        }
 }
