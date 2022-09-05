@@ -1,4 +1,4 @@
-pipeline{
+pipeline {
     agent any
     environment{
         PATH = "E:/MAVEN/apache-maven-3.5.4/bin:$PATH"
