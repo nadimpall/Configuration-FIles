@@ -1,0 +1,3 @@
+[submodule "multipipeline"]
+	path = multipipeline
+	url = https://github.com/nadimpall/multipipeline.git
